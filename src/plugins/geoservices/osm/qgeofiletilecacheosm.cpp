@@ -154,14 +154,18 @@ QSharedPointer<QGeoTileTexture> QGeoFileTileCacheOsm::getFromOfflineStorage(cons
     if (providerId < 0 || providerId >= m_providers.size())
         return QSharedPointer<QGeoTileTexture>();
 
+    // HACK!!! to fix initial loading time! If file format/extension (png, jpg, etc.) pecified - load it directly
     QString path;
     if (m_offlineFormat != QStringLiteral("*"))
     {
+        // Fast direct tile file loading by specific name
         const QString fileName = tileSpecToFilename(spec, m_offlineFormat, providerId);
         path = m_offlineDirectory.absoluteFilePath(fileName);
     }
     else
     {
+        // Previous version - documented behavior. Scans forder to find all files with specified name and any
+        // extension. Since it needs to scan all files the loading time depends on number of files in directory
         const QString fileName = tileSpecToFilename(spec, m_offlineFormat, providerId);
         QStringList validTiles = m_offlineDirectory.entryList({fileName});
         if (!validTiles.size())
