@@ -51,6 +51,7 @@ class QGeoFileTileCacheOsm : public QGeoFileTileCache
 public:
     QGeoFileTileCacheOsm(const QVector<QGeoTileProviderOsm *> &providers,
                          const QString &offlineDirectory = QString(),
+                         const QString &offlineFormat = QString(),
                          const QString &directory = QString(),
                          QObject *parent = 0);
     ~QGeoFileTileCacheOsm();
@@ -76,6 +77,7 @@ protected:
     void clearObsoleteTiles(const QGeoTileProviderOsm *p);
 
     QDir m_offlineDirectory;
+    QString m_offlineFormat;
     bool m_offlineData;
     QVector<QGeoTileProviderOsm *> m_providers;
     QVector<bool> m_highDpi;

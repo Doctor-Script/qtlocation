@@ -47,9 +47,10 @@ QT_BEGIN_NAMESPACE
 
 QGeoFileTileCacheOsm::QGeoFileTileCacheOsm(const QVector<QGeoTileProviderOsm *> &providers,
                                            const QString &offlineDirectory,
+                                           const QString &offlineFormat,
                                            const QString &directory,
                                            QObject *parent)
-:   QGeoFileTileCache(directory, parent), m_offlineDirectory(offlineDirectory), m_offlineData(false), m_providers(providers)
+:   QGeoFileTileCache(directory, parent), m_offlineDirectory(offlineDirectory), m_offlineFormat(offlineFormat), m_offlineData(false), m_providers(providers)
 {
     m_highDpi.resize(providers.size());
     if (!offlineDirectory.isEmpty()) {
@@ -153,12 +154,22 @@ QSharedPointer<QGeoTileTexture> QGeoFileTileCacheOsm::getFromOfflineStorage(cons
     if (providerId < 0 || providerId >= m_providers.size())
         return QSharedPointer<QGeoTileTexture>();
 
-    const QString fileName = tileSpecToFilename(spec, QStringLiteral("*"), providerId);
-    QStringList validTiles = m_offlineDirectory.entryList({fileName});
-    if (!validTiles.size())
-        return QSharedPointer<QGeoTileTexture>();
+    QString path;
+    if (m_offlineFormat != QStringLiteral("*"))
+    {
+        const QString fileName = tileSpecToFilename(spec, m_offlineFormat, providerId);
+        path = m_offlineDirectory.absoluteFilePath(fileName);
+    }
+    else
+    {
+        const QString fileName = tileSpecToFilename(spec, m_offlineFormat, providerId);
+        QStringList validTiles = m_offlineDirectory.entryList({fileName});
+        if (!validTiles.size())
+            return QSharedPointer<QGeoTileTexture>();
 
-    QFile file(m_offlineDirectory.absoluteFilePath(validTiles.first()));
+        path = m_offlineDirectory.absoluteFilePath(validTiles.first());
+    }
+    QFile file(path);
     if (!file.open(QIODevice::ReadOnly))
         return QSharedPointer<QGeoTileTexture>();
     QByteArray bytes = file.readAll();

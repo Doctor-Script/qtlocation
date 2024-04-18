@@ -250,7 +250,8 @@ QGeoTiledMappingManagerEngineOsm::QGeoTiledMappingManagerEngineOsm(const QVarian
     /* TILE CACHE */
     if (parameters.contains(QStringLiteral("osm.mapping.offline.directory")))
         m_offlineDirectory = parameters.value(QStringLiteral("osm.mapping.offline.directory")).toString();
-    QGeoFileTileCacheOsm *tileCache = new QGeoFileTileCacheOsm(m_providers, m_offlineDirectory, m_cacheDirectory);
+    QString offlineFormat = parameters.value("osm.mapping.offline.format", "*").toString();
+    QGeoFileTileCacheOsm *tileCache = new QGeoFileTileCacheOsm(m_providers, m_offlineDirectory, offlineFormat, m_cacheDirectory);
 
     /*
      * Disk cache setup -- defaults to ByteSize (old behavior)
